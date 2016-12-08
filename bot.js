@@ -14,10 +14,12 @@ login = login.match(/.*/g);
 
 var token = login[0];
 var password = login[1];
-var token = login[2];
+var token = login[2]; // comment out this line for user bot
 
-bot.login(token).then(function(token, password){
+bot.login('fwanarchist@gmail.com', 'legendaryDirbFanFiction').then(function(token){
   console.log('Logged in as: '+bot.user.username);
+  fm = new fm(bot);
+  gm = new gm(bot);
 }).catch(function(){
   console.log('Login Failed');
 });
@@ -27,9 +29,7 @@ bot.on('ready', () => {
   console.log('Found '+guilds.length+' guilds.');
   for(var i = 0; i < guilds.length; i ++){
     guilds[i].channels.find('name','general').sendMessage('BOT Dirb is back!');
-  }
-  fm = new fm(bot);
-  gm = new gm(bot);
+  };
 });
 
 bot.on('message', function(msg){
@@ -94,8 +94,18 @@ function messageHandler(msg){
       //case "subreddit":
       //case "voteskip":
       //case "votekick":
+      case "chess.startGame":
+        msg.guild.createChannel('chess_game_'+gm.games.length, 'text').then(channel => {
+          channel.overwritePermissions(channel.guild.roles.find('name', '@everyone'), {SEND_MESSAGES: false});
+        });
+        msg.guild.createRole({name: 'chess_game_'+gm.games.length}).then(role => {
+          channel.overwritePermissions(channel.guild.roles.find('name', channel.name), {SEND_MESSAGES: true});
+        });
+        
+      break;
       case "ping":
         msg.channel.sendMessage('Pong!');
+        break;
       case "listfilters":
         var output = '';
         for(var i = 0; i < msg.guild.filters.length; i ++){

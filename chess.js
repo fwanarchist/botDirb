@@ -1,8 +1,70 @@
 
 class chessGame {
-    constructor(guild, player1, player2){
-        if(!player2){player2 = guild.client}
-
+    constructor(channel, player1, gameNumber){
+        this.player2 = channel.client;
+        this.players = [
+            player1,
+            this.player2
+        ];
+        this.channel = channel;
+        this.player1 = player1;
+        this.board = [
+            ['wr', 'wn', 'wb', 'wq', 'wk', 'wk', 'wb', 'wn', 'wr'],
+            ['wp', 'wp', 'wp', 'wp', 'wp', 'wp', 'wp', 'wp', 'wp'],
+            ['et', 'et', 'et', 'et', 'et', 'et', 'et', 'et', 'et'],
+            ['et', 'et', 'et', 'et', 'et', 'et', 'et', 'et', 'et'],
+            ['et', 'et', 'et', 'et', 'et', 'et', 'et', 'et', 'et'],
+            ['et', 'et', 'et', 'et', 'et', 'et', 'et', 'et', 'et'],
+            ['bp', 'bp', 'bp', 'bp', 'bp', 'bp', 'bp', 'bp', 'bp'],
+            ['br', 'bn', 'bb', 'bq', 'bk', 'bk', 'bb', 'bn', 'br'],
+        ];
+        this.emptyBoard = [
+            [1,0,1,0,1,0,1,0],
+            [0,1,0,1,0,1,0,1],
+            [1,0,1,0,1,0,1,0],
+            [0,1,0,1,0,1,0,1],
+            [1,0,1,0,1,0,1,0],
+            [0,1,0,1,0,1,0,1],
+            [1,0,1,0,1,0,1,0],
+            [0,1,0,1,0,1,0,1],
+        ];
+    }
+    printBoard(player){
+        var str = '';
+        var invert = player == 1;
+        for(var i = 0; i < this.board.length; i++){
+            for(var j = 0; j < this.board.length; j++){
+                str += ':chess_'+(this.emptyBoard[(invert)?(7-i):(i)][(invert)?(7-j):(j)])?('white'):('black')+'_'+/(.)./g.exec(this.board[(invert)?(7-i):(i)][(invert)?(7-j):(j)])[1];
+                switch(/.(.)/g.exec(this.board[(invert)?(7-i):(i)][(invert)?(7-j):(j)])[1]){
+                    case 'r':
+                        str += 'Rook';
+                        break;
+                    case 'n':
+                        str += 'Knight';
+                        break;
+                    case 'b':
+                        str += 'Bishop';
+                        break;
+                    case 'k':
+                        str += 'King';
+                        break;
+                    case 'q':
+                        str += 'Queen';
+                        break;
+                    case 'p':
+                        str += 'Pawn';
+                        break;
+                    case 't':
+                        str = str.substr(0,str.length-1);
+                        str += 'tile';
+                        break;
+                }
+                str += ':';
+            }
+            str += "  "+(8-i)+"\n";
+        }
+        str += "| A | B | C | D | E | F | G | H |";
+        return str;
     }
 }
 
@@ -16,7 +78,6 @@ class chessGameManager {
     constructor(client){
         this.games = [];
         this.client = client;
-        var guilds = client.guilds.array();
         this.checkEmojis();
     }
     checkEmojis(){
@@ -49,6 +110,10 @@ class chessGameManager {
             if(!guilds[i].emojis.find('name','chess_white_wQueen')){guilds[i].createEmoji('./chess/white/wQueen.png', 'chess_white_wQueen');}
             if(!guilds[i].emojis.find('name','chess_white_wPawn')){guilds[i].createEmoji('./chess/white/wPawn.png', 'chess_white_wPawn');}
         }
+    }
+    addGame(channel, user){
+        this.games[this.games.length] = new chessGame(channel, user, this.games.length);
+        
     }
 }
 
